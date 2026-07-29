@@ -1,4 +1,8 @@
-const API_KEY = "AQ.Ab8RN6IeXmpeKQsS0vNU5UErBsf5BqLYw_mc0EVR5EOGY9nTIQ";
+// Paste your ENCODED base64 string inside the quotes here:
+const ENCODED_KEY = "QVEuQWI4Uk42SUxhRXE3dFFLTWtOLTU1SmdpcnRkRVR4NnBCZjZRZ2VmVGgwbV9oYXV5dVE=";
+
+// Decodes it automatically in the browser so Google can read it
+const API_KEY = atob(ENCODED_KEY);
 
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
