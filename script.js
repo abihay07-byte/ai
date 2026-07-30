@@ -1,4 +1,4 @@
-// Paste your raw AQ key directly here (e.g., "AQ.Ab123...")
+// Paste your API key here (e.g. "AQ...")
 const API_KEY = "AQ.Ab8RN6LELuj53M0YMwp4lEdvQ3mK9gsPTP61fFM2IpMWem9vqA".trim();
 
 const chatBox = document.getElementById("chat-box");
@@ -14,15 +14,15 @@ async function sendMessage() {
 
   const loadingElem = appendMessage("Bot: Thinking...", "bot-message");
 
-  // Endpoint setup
-  const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+  // Endpoint updated to gemini-3.6-flash
+  const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
 
   try {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "x-goog-api-key": API_KEY // Sends AQ key safely in HTTP Header
+        "x-goog-api-key": API_KEY 
       },
       body: JSON.stringify({
         contents: [{ parts: [{ text: text }] }]
