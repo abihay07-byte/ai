@@ -1,5 +1,5 @@
-// Paste your API key from Google AI Studio here:
-const API_KEY = "AQ.Ab8RN6J-lzWEVViayJ1SrRZNulP6f05M27A7lGwQUsfLUR3RnA";
+// Paste your raw AQ key directly here (e.g., "AQ.Ab123...")
+const API_KEY = "AQ.Ab8RN6LELuj53M0YMwp4lEdvQ3mK9gsPTP61fFM2IpMWem9vqA".trim();
 
 const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
@@ -9,48 +9,54 @@ async function sendMessage() {
   const text = userInput.value.trim();
   if (!text) return;
 
-  // Add user message to chat box
-  chatBox.innerHTML += `<p><strong>You:</strong> ${text}</p>`;
+  appendMessage(`You: ${text}`, "user-message");
   userInput.value = "";
-  chatBox.scrollTop = chatBox.scrollHeight;
 
-  // Show loading message
-  const loadingElem = document.createElement("p");
-  loadingElem.innerHTML = "<strong>Bot:</strong> Thinking...";
-  chatBox.appendChild(loadingElem);
+  const loadingElem = appendMessage("Bot: Thinking...", "bot-message");
+
+  // Endpoint setup
+  const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
   try {
-   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    contents: [{ parts: [{ text: text }] }]
-  })
-});      
-      
-      
-              
-    
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "x-goog-api-key": API_KEY // Sends AQ key safely in HTTP Header
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: text }] }]
+      })
+    });
 
     const data = await response.json();
 
-    if (data.error) {
-      loadingElem.innerHTML = `<strong>Bot Error:</strong> ${data.error.message}`;
-    } else {
-      const reply = data.candidates[0].content.parts[0].text;
-      loadingElem.innerHTML = `<strong>Bot:</strong> ${reply}`;
+    if (!response.ok) {
+      loadingElem.style.color = "red";
+      loadingElem.innerText = `Error (${response.status}): ${data.error ? data.error.message : "Authentication Failed"}`;
+      return;
     }
+
+    const reply = data.candidates[0].content.parts[0].text;
+    loadingElem.style.color = "black";
+    loadingElem.innerText = `Bot: ${reply}`;
+
   } catch (err) {
-    loadingElem.innerHTML = `<strong>Bot Error:</strong> Could not reach server.`;
+    loadingElem.style.color = "red";
+    loadingElem.innerText = `Network Error: ${err.message}`;
   }
-  
-  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Trigger on button click
-sendBtn.addEventListener("click", sendMessage);
+function appendMessage(text, className) {
+  const p = document.createElement("p");
+  p.className = className;
+  p.innerText = text;
+  chatBox.appendChild(p);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return p;
+}
 
-// Trigger on pressing "Enter" in the text box
-userInput.addEventListener("keypress", (e) => {
+sendBtn?.addEventListener("click", sendMessage);
+userInput?.addEventListener("keypress", (e) => {
   if (e.key === "Enter") sendMessage();
 });
