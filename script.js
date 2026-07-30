@@ -1,58 +1,71 @@
-// 1. Put your raw Google AI Studio API Key inside the quotes below (starts with AIzaSy...)
-const API_KEY = "QVEuQWI4Uk42TDZVNHpOd1BURFVqOU5Td2sxMWpMNDVtSVFxUS13S2NoY2RoNlFHV0IyZlE=";
+const API_KEY = "AQ.Ab8RN6ILaEq7tQKMkN-55JgirtdETx6pBf6QgefTh0m_hauyuQ";
 
-// 2. Select HTML elements
-const chatInput = document.querySelector("#chat-input") || document.querySelector("input");
-const sendBtn = document.querySelector("#send-btn") || document.querySelector("button");
-const chatBox = document.querySelector("#chat-box") || document.querySelector(".chat-container") || document.body;
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
-// 3. Function to send message to Gemini API
-async function generateResponse(userMessage) {
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+const chatBox = document.getElementById('chat-box');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
 
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: userMessage }]
-        }]
-      })
-    });
+async function fetchAIResponse(userPrompt) {
+    const loadingDiv = document.createElement('div');
+    loadingDiv.classList.add('bot');
+    loadingDiv.textContent = "Thinking...";
+    chatBox.appendChild(loadingDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
 
-    const data = await response.json();
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: userPrompt }]
+                }]
+            })
+        });
 
-    if (!response.ok) {
-      console.error("API Error Response:", data);
-      return `Error: ${data.error ? data.error.message : "Failed to fetch response"}`;
+        const data = await response.json();
+        chatBox.removeChild(loadingDiv);
+
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const aiReply = data.candidates[0].content.parts[0].text;
+            appendMessage(aiReply, 'bot');
+        } else if (data.error) {
+            // Displays exact API error message (e.g. invalid key or quota exceeded)
+            appendMessage(`Error: ${data.error.message}`, 'bot');
+        } else {
+            appendMessage("Sorry, I couldn't process that response.", 'bot');
+        }
+    } catch (error) {
+        chatBox.removeChild(loadingDiv);
+        appendMessage("Error: Could not connect to the network.", 'bot');
+        console.error(error);
     }
-
-    return data.candidates[0].content.parts[0].text;
-  } catch (error) {
-    console.error("Fetch Error:", error);
-    return "Error connecting to server. Please check your connection.";
-  }
 }
 
-// 4. Handle Send Button Click
-if (sendBtn) {
-  sendBtn.addEventListener("click", async () => {
-    const message = chatInput.value.trim();
-    if (!message) return;
+function sendMessage() {
+    const text = userInput.value.trim();
+    if (text === '') return;
 
-    // Display user message
-    const userMsgElem = document.createElement("p");
-    userMsgElem.textContent = "You: " + message;
-    chatBox.appendChild(userMsgElem);
-    chatInput.value = "";
-
-    // Display bot response
-    const botMsgElem = document.createElement("p");
-    botMsgElem.textContent = "Bot is typing...";
-    chatBox.appendChild(botMsgElem);
-
-    const botResponse = await generateResponse(message);
-    botMsgElem.textContent = "Bot: " + botResponse;
-  });
+    appendMessage(text, 'user');
+    userInput.value = '';
+    fetchAIResponse(text);
 }
+
+function appendMessage(text, className) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add(className);
+    messageDiv.textContent = text;
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+sendBtn.addEventListener('click', sendMessage);
+
+userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
