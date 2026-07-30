@@ -1,5 +1,5 @@
 // 1. Put your raw Google AI Studio API Key inside the quotes below (starts with AIzaSy...)
-const API_KEY = "AQ.Ab8RN6L6U4zNwPTDUj9NSwk11jL45mIQqQ-wKchcdh6QGWB2fQ";
+const API_KEY = "QVEuQWI4Uk42TDZVNHpOd1BURFVqOU5Td2sxMWpMNDVtSVFxUS13S2NoY2RoNlFHV0IyZlE=";
 
 // 2. Select HTML elements
 const chatInput = document.querySelector("#chat-input") || document.querySelector("input");
