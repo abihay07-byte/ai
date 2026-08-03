@@ -14,7 +14,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 
 // ⚠️ REPLACE THIS WITH YOUR ACTUAL GEMINI API KEY
-const GEMINI_API_KEY = "AQ.Ab8RN6JfamCbmiH7L9Qq64yVp55d7KpaRJX_VuRnMn3VQxr22w"; 
+const GEMINI_API_KEY = "AQ.Ab8RN6K1qGNb_3E8w9Yx9skNFRfpfC0um_ZkN9zNQtazPqHzCw"; 
 
 export default function App() {
   const [messages, setMessages] = useState([
