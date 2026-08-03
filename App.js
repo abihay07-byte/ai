@@ -12,7 +12,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 
 // Paste your Google Gemini API key here
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+const GEMINI_API_KEY = "AQ.Ab8RN6K1qGNb_3E8w9Yx9skNFRfpfC0um_ZkN9zNQtazPqHzCw";
 
 export default function App() {
   const [messages, setMessages] = useState([
