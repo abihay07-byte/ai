@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "My chat",
+    "owner": "man21s-team",
     "slug": "my-chat",
     "version": "1.0.0",
     "orientation": "portrait",
