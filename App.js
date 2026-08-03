@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-// Paste your Google Gemini API key here
-const GEMINI_API_KEY = "AQ.Ab8RN6K1qGNb_3E8w9Yx9skNFRfpfC0um_ZkN9zNQtazPqHzCw";
+// ⚠️ Make sure your key is directly inside quotes without extra spaces
+const GEMINI_API_KEY = "AQ.Ab8RN6ILwYZeVkj42IOhV6GNv-mC_7GFVLqBv2E5Wf9YNBSm3g"; // <--- Replace with your full key
 
 export default function App() {
   const [messages, setMessages] = useState([
@@ -32,8 +32,9 @@ export default function App() {
     setLoading(true);
 
     try {
+      // Pass key in BOTH URL query and Header for full key format compatibility
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 
@@ -48,18 +49,20 @@ export default function App() {
 
       const data = await response.json();
 
-      if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+      if (response.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
         const aiResponseText = data.candidates[0].content.parts[0].text;
         const aiMsg = { id: Date.now() + 1, text: aiResponseText.trim(), sender: 'ai' };
         setMessages((prev) => [...prev, aiMsg]);
       } else {
-        throw new Error('Invalid response structure');
+        // Display exact API error returned by Google
+        const apiErrorReason = data?.error?.message || `HTTP Error ${response.status}`;
+        throw new Error(apiErrorReason);
       }
     } catch (error) {
       console.error('API Request Error:', error);
       const errorMsg = { 
         id: Date.now() + 1, 
-        text: 'Sorry, I couldn\'t generate a response. Please check your API key or connection.', 
+        text: `⚠️ Error: ${error.message}`, 
         sender: 'ai' 
       };
       setMessages((prev) => [...prev, errorMsg]);
